@@ -14,6 +14,7 @@ void mat_mul_classify(double* a, double** b, double* result, int n, int p) {
     // matrix b of size n x p
     // matrix result of size 1 x p (array)
     // result = a * b
+    // PARALELIZAR MULTIPLICAÇÃO DE MATRIZ 
     int j, k;
     for (j = 0; j < p; j++) {
         result[j] = 0.0;

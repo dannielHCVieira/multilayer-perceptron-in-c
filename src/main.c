@@ -1,3 +1,33 @@
+/**
+ * Projeto 01 - Implementação Paralela de uma Técnica de Inteligência Artificial
+ * Grupo 02 - Danniel Henrique, Filipe Arthur, Henrique Augusto
+ * 
+ * Linhas onde mundanças:
+ * forward_propagation.c:19 - Paralelização de Multiplicação de Vetor1D por Vetor2D
+ * 
+ * Tempos de Execução (parcode):
+ *  - Sequencial: 
+ * real    0m14.086s
+ * user    0m14.080s
+ * sys     0m0.001s
+ * 
+ * - Paralela (1 thread):
+ * real    0m22.280s
+user    0m20.346s
+sys     0m1.928s
+ * - Paralela (2 threads):
+ real    0m48.960s
+user    1m32.374s
+sys     0m5.507s
+ *
+ * - Paralela (4):
+ * real    0m35.418s
+user    2m16.521s
+sys     0m4.277s
+ */
+
+
+
 /*
 Author: Manohar Mukku
 Date: 18.07.2018
@@ -10,6 +40,8 @@ GitHub: https://github.com/manoharmukku/multilayer-perceptron-in-c
 #include "read_csv.h"
 
 int main(int argc, char** argv) {
+    // LENDO E DEFININDO PARAMETROS:
+    // ---------- INICIO ----------
     /*
     argv[0]: Executable file name Ex: a.out
     argv[1]: Number of hidden layers Ex: 3
@@ -153,6 +185,8 @@ int main(int argc, char** argv) {
 
     // Create 2D array memory for the dataset
     param->data_train = (double**)malloc(param->train_sample_size * sizeof(double*));
+
+    // PARALELIZAR INICIANDO VETOR
     for (i = 0; i < param->train_sample_size; i++)
         param->data_train[i] = (double*)malloc(param->feature_size * sizeof(double));
 
@@ -167,6 +201,8 @@ int main(int argc, char** argv) {
 
     // Create 2D array memory for the dataset
     param->data_test = (double**)malloc(param->test_sample_size * sizeof(double*));
+
+    // PARALELIZAR INICIANDO VETOR
     for (i = 0; i < param->test_sample_size; i++)
         param->data_test[i] = (double*)malloc(param->feature_size * sizeof(double));
 
@@ -181,7 +217,8 @@ int main(int argc, char** argv) {
 
     layer_sizes[0] = param->feature_size - 1;
     layer_sizes[n_layers-1] = param->output_layer_size;
-
+    
+    // PARALELIZAR INICIANDO VETOR
     for (i = 1; i < n_layers-1 ; i++)
         layer_sizes[i] = param->hidden_layers_size[i-1];
 
@@ -191,13 +228,17 @@ int main(int argc, char** argv) {
 
     // Each 2D array between two layers i and i+1 is of size ((layer_size[i]+1) x layer_size[i+1])
     // The weight matrix includes weights for the bias terms too
+    // PARALELIZAR INICIANDO VETOR
     for (i = 0; i < n_layers-1; i++)
         param->weight[i] = (double**)calloc(layer_sizes[i]+1, sizeof(double*));
 
+    // PARALELIZAR INICIANDO MATRIZ
     int j;
     for (i = 0; i < n_layers-1; i++)
         for (j = 0; j < layer_sizes[i]+1; j++)
             param->weight[i][j] = (double*)calloc(layer_sizes[i+1], sizeof(double));
+
+    // ---------- FIM ----------
 
     // Train the neural network on the train data
     printf("Training:\n");

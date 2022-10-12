@@ -14,17 +14,27 @@ void mat_mul(double* a, double** b, double* result, int n, int p) {
     // matrix b of size n x p
     // matrix result of size 1 x p (array)
     // result = a * b
-    int j, k;
-    for (j = 0; j < p; j++) {
-        result[j] = 0.0;
-        for (k = 0; k < n; k++)
-            result[j] += (a[k] * b[k][j]);
+    // PARALELIZAR MULTIPLICAÇÃO DE VETOR x MATRIZ 
+    //#pragma omp parallel shared(a, b, result)  #pragma omp for private(sum)
+    omp_set_num_threads(4);
+    #pragma omp parallel 
+    {
+        int j, k;
+        #pragma omp for
+        for (j = 0; j < p; j++) {
+            double sum = 0;
+            for (k = 0; k < n; k++){
+                sum += (a[k] * b[k][j]);
+            }
+            result[j] = sum;
+        }
     }
 }
 
 void identity(int n, double* input, double* output) {
     output[0] = 1; // Bias term
 
+    // PARALELIZAR INICIANDO VETOR
     int i;
     for (i = 0; i < n; i++) 
         output[i+1] = input[i]; // Identity function
@@ -33,6 +43,7 @@ void identity(int n, double* input, double* output) {
 void sigmoid(int n, double* input, double* output) {
     output[0] = 1; // Bias term
 
+    // PARALELIZAR INICIANDO VETOR
     int i;
     for (i = 0; i < n; i++) 
         output[i+1] = 1.0 / (1.0 + exp(-input[i])); // Sigmoid function
@@ -41,6 +52,7 @@ void sigmoid(int n, double* input, double* output) {
 void tan_h(int n, double* input, double* output) {
     output[0] = 1; // Bias term
 
+    // PARALELIZAR INICIANDO VETOR
     int i;
     for (i = 0; i < n; i++) 
         output[i+1] = tanh(input[i]); // tanh function
@@ -49,6 +61,7 @@ void tan_h(int n, double* input, double* output) {
 void relu(int n, double* input, double* output) {
     output[0] = 1; // Bias term
 
+    // PARALELIZAR INICIANDO VETOR
     int i;
     for (i = 0; i < n; i++) 
         output[i+1] = max(0.0, input[i]); // ReLU function
@@ -57,11 +70,13 @@ void relu(int n, double* input, double* output) {
 void softmax(int n, double* input, double* output) {
     output[0] = 1; // Bias term
 
+    // PARALELIZAR INICIANDO VETOR
     int i;
     double sum = 0.0;
     for (i = 0; i < n; i++)
         sum += exp(input[i]);
 
+    // PARALELIZAR INICIANDO VETOR
     for (i = 0; i < n; i++) 
         output[i+1] = exp(input[i]) / sum; // Softmax function
 }
@@ -70,6 +85,7 @@ void forward_propagation(parameters* param, int training_example, int n_layers, 
     // Fill the input layer's input and output (both are equal) from data matrix with the given training example
     int i;
     layer_outputs[0][0] = 1; // Bias term of input layer
+    // PARALELIZAR INICIANDO VETOR
     for (i = 0; i < param->feature_size-1; i++)
         layer_outputs[0][i+1] = layer_inputs[0][i] = param->data_train[training_example][i];
 

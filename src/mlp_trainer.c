@@ -13,10 +13,13 @@ void initialize_weights(parameters* param, int n_layers, int* layer_sizes) {
     // epsilon = sqrt(6/(layer_size[i] + layer_size[i+1])) used for random initialization
     double* epsilon = (double*)calloc(n_layers-1, sizeof(double));
     int i;
+
+    // PARALELIZAR INICIANDO VETOR
     for (i = 0; i < n_layers-1; i++)
         epsilon[i] = sqrt(6.0 / (layer_sizes[i] + layer_sizes[i+1]));
 
     // Random initialization between [-epsilon[i], epsilon[i]] for weight[i]
+    // PARALELIZAR INICIANDO MATRIZ 3 DIMENSÕES
     int j, k;
     for (i = 0; i < n_layers-1; i++)
         for (j = 0; j < layer_sizes[i]+1; j++)
@@ -45,6 +48,7 @@ void mlp_trainer(parameters* param, int* layer_sizes) {
     // Create memory for arrays of inputs to the layers
     double** layer_inputs = (double**)calloc(n_layers, sizeof(double*));
 
+    // PARALELIZAR INICIANDO VETOR
     int i;
     for (i = 0; i < n_layers; i++)
         layer_inputs[i] = (double*)calloc(layer_sizes[i], sizeof(double));
@@ -52,6 +56,7 @@ void mlp_trainer(parameters* param, int* layer_sizes) {
     // Create memory for arrays of outputs from the layers
     double** layer_outputs = (double**)calloc(n_layers, sizeof(double*));
 
+    // PARALELIZAR INICIANDO VETOR
     for (i = 0; i < n_layers; i++)
         layer_outputs[i] = (double*)calloc(layer_sizes[i]+1, sizeof(double));
 
@@ -59,10 +64,12 @@ void mlp_trainer(parameters* param, int* layer_sizes) {
     initialize_weights(param, n_layers, layer_sizes);
 
     int* indices = (int*)calloc(param->train_sample_size, sizeof(int));
+    // PARALELIZAR INICIANDO VETOR
     for (i = 0; i < param->train_sample_size; i++)
         indices[i] = i;
 
     // Train the MLP
+    // SEÇÃO VITAL
     int training_example, j;
     for (i = 0; i < param->n_iterations_max; i++) {
         printf("Iteration %d of %d(max)\r", i+1, param->n_iterations_max);
@@ -84,11 +91,13 @@ void mlp_trainer(parameters* param, int* layer_sizes) {
     // Free the memory allocated in Heap
     free(indices);
 
+// PARALELIZAR LIMPANDO VETOR
     for (i = 0; i < n_layers; i++)
         free(layer_outputs[i]);
 
     free(layer_outputs);
-
+    
+// PARALELIZAR LIMPANDO VETOR
     for (i = 0; i < n_layers; i++)
         free(layer_inputs[i]);
 

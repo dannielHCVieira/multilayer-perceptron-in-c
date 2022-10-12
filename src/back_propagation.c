@@ -8,24 +8,28 @@ GitHub: https://github.com/manoharmukku/multilayer-perceptron-in-c
 #include "back_propagation.h"
 
 void d_identity(int layer_size, double* layer_input, double* layer_output, double* layer_derivative) {
+    // PARALELIZAR INICIANDO VETOR
     int i;
     for (i = 0; i < layer_size; i++)
         layer_derivative[i] = 1;
 }
 
 void d_sigmoid(int layer_size, double* layer_input, double* layer_output, double* layer_derivative) {
+    // PARALELIZAR INICIANDO VETOR
     int i;
     for (i = 0; i < layer_size; i++)
         layer_derivative[i] = layer_output[i+1] * (1.0 - layer_output[i+1]);
 }
 
 void d_tanh(int layer_size, double* layer_input, double* layer_output, double* layer_derivative) {
+    // PARALELIZAR INICIANDO VETOR
     int i;
     for (i = 0; i < layer_size; i++)
         layer_derivative[i] = 1.0 - layer_output[i+1] * layer_output[i+1];
 }
 
 void d_relu(int layer_size, double* layer_input, double* layer_output, double* layer_derivative) {
+    // PARALELIZAR INICIANDO VETOR
     int i;
     for (i = 0; i < layer_size; i++) {
         if (layer_input[i] > 0)
@@ -38,6 +42,7 @@ void d_relu(int layer_size, double* layer_input, double* layer_output, double* l
 }
 
 void d_softmax(int layer_size, double* layer_input, double* layer_output, double* layer_derivative) {
+    // PARALELIZAR INICIANDO VETOR
     int i;
     for (i = 0; i < layer_size; i++)
         layer_derivative[i] = layer_output[i+1] * (1.0 - layer_output[i+1]);
@@ -48,6 +53,7 @@ void calculate_local_gradient(parameters* param, int layer_no, int n_layers, int
     // Create memory for derivatives
     double** layer_derivatives = (double**)calloc(n_layers, sizeof(double*));
 
+// PARALELIZAR INICIANDO VETOR
     int i;
     for (i = 0; i < n_layers; i++)
         layer_derivatives[i] = (double*)calloc(layer_sizes[i], sizeof(double));
@@ -57,6 +63,7 @@ void calculate_local_gradient(parameters* param, int layer_no, int n_layers, int
         // Error produced at the output layer
         double* error_output = (double*)calloc(param->output_layer_size, sizeof(double));
 
+        // PARALELIZAR INICIANDO VETOR
         for (i = 0; i < param->output_layer_size; i++)
             error_output[i] = expected_output[i] - layer_outputs[layer_no][i+1];
 
@@ -66,6 +73,7 @@ void calculate_local_gradient(parameters* param, int layer_no, int n_layers, int
             case 1: // identity
                 d_identity(param->output_layer_size, layer_inputs[layer_no], layer_outputs[layer_no], layer_derivatives[layer_no]);
 
+                // PARALELIZAR INICIANDO VETOR
                 for (i = 0; i < param->output_layer_size; i++)
                     local_gradient[layer_no][i] = error_output[i] * layer_derivatives[layer_no][i];
 
@@ -73,6 +81,7 @@ void calculate_local_gradient(parameters* param, int layer_no, int n_layers, int
             case 2: // sigmoid
                 d_sigmoid(param->output_layer_size, layer_inputs[layer_no], layer_outputs[layer_no], layer_derivatives[layer_no]);
 
+                // PARALELIZAR INICIANDO VETOR
                 for (i = 0; i < param->output_layer_size; i++)
                     local_gradient[layer_no][i] = error_output[i] * layer_derivatives[layer_no][i];
 
@@ -80,6 +89,7 @@ void calculate_local_gradient(parameters* param, int layer_no, int n_layers, int
             case 3: // tanh
                 d_tanh(param->output_layer_size, layer_inputs[layer_no], layer_outputs[layer_no], layer_derivatives[layer_no]);
 
+                // PARALELIZAR INICIANDO VETOR
                 for (i = 0; i < param->output_layer_size; i++)
                     local_gradient[layer_no][i] = error_output[i] * layer_derivatives[layer_no][i];
 
@@ -87,6 +97,7 @@ void calculate_local_gradient(parameters* param, int layer_no, int n_layers, int
             case 4: // relu
                 d_relu(param->output_layer_size, layer_inputs[layer_no], layer_outputs[layer_no], layer_derivatives[layer_no]);
 
+                // PARALELIZAR INICIANDO VETOR
                 for (i = 0; i < param->output_layer_size; i++)
                     local_gradient[layer_no][i] = error_output[i] * layer_derivatives[layer_no][i];
 
@@ -94,6 +105,7 @@ void calculate_local_gradient(parameters* param, int layer_no, int n_layers, int
             case 5: // softmax
                 d_softmax(param->output_layer_size, layer_inputs[layer_no], layer_outputs[layer_no], layer_derivatives[layer_no]);
 
+                // PARALELIZAR INICIANDO VETOR
                 for (i = 0; i < param->output_layer_size; i++)
                     local_gradient[layer_no][i] = error_output[i] * layer_derivatives[layer_no][i];
 
@@ -115,6 +127,7 @@ void calculate_local_gradient(parameters* param, int layer_no, int n_layers, int
             case 1: // identity
                 d_identity(layer_sizes[layer_no], layer_inputs[layer_no], layer_outputs[layer_no], layer_derivatives[layer_no]);
 
+                // PARALELIZAR SOMA DE VALORES DE VETORES EM UMA VARIAVEL
                 for (i = 0; i < layer_sizes[layer_no]; i++) {
                     double error = 0.0;
                     for (j = 0; j < layer_sizes[layer_no+1]; j++)
@@ -127,6 +140,7 @@ void calculate_local_gradient(parameters* param, int layer_no, int n_layers, int
             case 2: // sigmoid
                 d_sigmoid(layer_sizes[layer_no], layer_inputs[layer_no], layer_outputs[layer_no], layer_derivatives[layer_no]);
 
+                // PARALELIZAR SOMA DE VALORES DE VETORES EM UMA VARIAVEL
                 for (i = 0; i < layer_sizes[layer_no]; i++) {
                     double error = 0.0;
                     for (j = 0; j < layer_sizes[layer_no+1]; j++)
@@ -139,6 +153,7 @@ void calculate_local_gradient(parameters* param, int layer_no, int n_layers, int
             case 3: // tanh
                 d_tanh(layer_sizes[layer_no], layer_inputs[layer_no], layer_outputs[layer_no], layer_derivatives[layer_no]);
 
+                // PARALELIZAR SOMA DE VALORES DE VETORES EM UMA VARIAVEL
                 for (i = 0; i < layer_sizes[layer_no]; i++) {
                     double error = 0.0;
                     for (j = 0; j < layer_sizes[layer_no+1]; j++)
@@ -151,6 +166,7 @@ void calculate_local_gradient(parameters* param, int layer_no, int n_layers, int
             case 4: // relu
                 d_relu(layer_sizes[layer_no], layer_inputs[layer_no], layer_outputs[layer_no], layer_derivatives[layer_no]);
 
+                // PARALELIZAR SOMA DE VALORES DE VETORES EM UMA VARIAVEL
                 for (i = 0; i < layer_sizes[layer_no]; i++) {
                     double error = 0.0;
                     for (j = 0; j < layer_sizes[layer_no+1]; j++)
@@ -163,6 +179,7 @@ void calculate_local_gradient(parameters* param, int layer_no, int n_layers, int
             case 5: // softmax
                 d_softmax(layer_sizes[layer_no], layer_inputs[layer_no], layer_outputs[layer_no], layer_derivatives[layer_no]);
 
+                // PARALELIZAR SOMA DE VALORES DE VETORES EM UMA VARIAVEL
                 for (i = 0; i < layer_sizes[layer_no]; i++) {
                     double error = 0.0;
                     for (j = 0; j < layer_sizes[layer_no+1]; j++)
@@ -208,10 +225,12 @@ void back_propagation(parameters* param, int training_example, int n_layers, int
 
     // Each 2D array between two layers i and i+1 is of size ((layer_size[i]+1) x layer_size[i+1])
     // The weight_correction matrix includes weight corrections for the bias terms too
+    // PARALELIZAR INICIANDO VETOR
     int i;
     for (i = 0; i < n_layers-1; i++)
         weight_correction[i] = (double**)calloc(layer_sizes[i]+1, sizeof(double*));
 
+    // PARALELIZAR INICIAR MATRIZ
     int j;
     for (i = 0; i < n_layers-1; i++)
         for (j = 0; j < layer_sizes[i]+1; j++)
@@ -221,17 +240,21 @@ void back_propagation(parameters* param, int training_example, int n_layers, int
     // Create memory for local gradient (delta) for each layer
     double** local_gradient = (double**)calloc(n_layers, sizeof(double*));
 
+    // PARALELIZAR INICIANDO VETOR
     for (i = 0; i < n_layers; i++)
         local_gradient[i] = (double*)calloc(layer_sizes[i], sizeof(double));
 
     /*----------- Calculate weight corrections for all layers' weights -------------------*/
     // Weight correction for the output layer
     calculate_local_gradient(param, n_layers-1, n_layers, layer_sizes, layer_inputs, layer_outputs, expected_output, local_gradient);
+    
+    // PARALELIZAR INICIANDO VALOR EM MATRIZ TRIDIMENSIONAL
     for (i = 0; i < param->output_layer_size; i++)
         for (j = 0; j < layer_sizes[n_layers-2]+1; j++)
             weight_correction[n_layers-2][j][i] = (param->learning_rate) * local_gradient[n_layers-1][i] * layer_outputs[n_layers-2][j];
 
     // Weight correction for the hidden layers
+    // PARALELIZAR
     int k;
     for (i = n_layers-2; i >= 1; i--) {
         calculate_local_gradient(param, i, n_layers, layer_sizes, layer_inputs, layer_outputs, expected_output, local_gradient);
@@ -242,6 +265,7 @@ void back_propagation(parameters* param, int training_example, int n_layers, int
     }
 
     /*----------------- Update the weights -------------------------------------*/
+    // PARALELIZAR OPERAÇÃO DE SUBTRAÇÃO
     for (i = 0; i < n_layers-1; i++) {
         for (j = 0; j < layer_sizes[i]+1; j++) {
             for (k = 0; k < layer_sizes[i+1]; k++) {
@@ -252,15 +276,18 @@ void back_propagation(parameters* param, int training_example, int n_layers, int
 
 
     // Free the memory allocated in Heap
+    // PARALELIZAR LIMPANDO VETOR
     for (i = 0; i < n_layers; i++)
         free(local_gradient[i]);
 
     free(local_gradient);
 
+// PARALELIZAR LIMPANDO MATRIZ
     for (i = 0; i < n_layers - 1; i++)
         for (j = 0; j < layer_sizes[i]+1; j++)
             free(weight_correction[i][j]);
 
+// PARALELIZAR LIMPANDO VETOR
     for (i = 0; i < n_layers - 1; i++)
         free(weight_correction[i]);
 

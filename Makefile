@@ -10,11 +10,11 @@ EXECUTABLE = MLP
 
 # Generate the executable file
 $(EXECUTABLE): $(SRC_DIR)/main.c $(OBJECTS)
-	$(CC) $(CFLAGS) $< $(OBJECTS) -o $(EXECUTABLE) -I $(INCL_DIR) -lm
+	$(CC) $(CFLAGS) -fopenmp $< $(OBJECTS) -o $(EXECUTABLE) -I $(INCL_DIR) -lm
 
 # Compile and Assemble C source files into object files
 $(OBJ_DIR)/%.o: $(SRC_DIR)/%.c $(INCLUDES)
-	$(CC) $(CFLAGS) -I $(INCL_DIR) -c $< -o $@
+	$(CC) $(CFLAGS) -fopenmp -I $(INCL_DIR) -c $< -o $@ -lm
 
 # Clean the generated executable file and object files
 clean:

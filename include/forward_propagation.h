@@ -5,6 +5,7 @@
 #include <stdlib.h>
 #include <math.h>
 #include "parameters.h"
+#include <omp.h>
 
 void forward_propagation(parameters*, int, int, int*, double**, double**);
 
